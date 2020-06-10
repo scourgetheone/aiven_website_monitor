@@ -5,5 +5,5 @@ __pycache__
 app/__pycache__
 app/*.pyc
 app/ssl/*
-app/kafka_config.json
-app/pgsql_config.json
+app/*kafka_config.json
+app/*pgsql_config.json
