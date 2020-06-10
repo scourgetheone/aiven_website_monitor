@@ -1,0 +1,9 @@
+__pycache__
+*.pyc
+*.egg-info
+
+app/__pycache__
+app/*.pyc
+app/ssl/*
+app/kafka_config.json
+app/pgsql_config.json

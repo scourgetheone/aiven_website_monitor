@@ -1,0 +1,5 @@
+pgcli
+psycopg2-binary
+kafka-python
+requests
+timeloop
