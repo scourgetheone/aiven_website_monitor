@@ -46,4 +46,7 @@ def run_polling():
     timeloop.start(block=True)
 
 if __name__ == '__main__':
-    run_polling()
+    try:
+        run_polling()
+    except KeyboardInterrupt:
+        producer.close()
