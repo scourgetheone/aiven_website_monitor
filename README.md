@@ -51,14 +51,14 @@ To run the module that consumes messages from the kafka broker, run in another t
 python -m app.broker_db_sync
 ```
 
-If you would like to see currently which websites are being polled, open **pgcli** (HOSTNAME, PORT, USER, and PASSWORD to database is in pgsql_config.json in the "secret" zip file)
+**If you would like to see currently which websites are being polled**, open **pgcli** (HOSTNAME, PORT, USER, and PASSWORD to database is in pgsql_config.json in the "secret" zip file)
 ```sql
 pgcli -h HOSTNAME -p PORT -u USER -W homework
 
 SELECT * FROM websites;
 ```
 
-If you would like to see the poll data saved into the database, open **pgcli** and make this query:
+**If you would like to see the poll data saved into the database**, open **pgcli** and make this query:
 ```sql
 SELECT * FROM website_status order by timestamp_utc desc limit 20;
 ```
@@ -76,7 +76,7 @@ Alternatively you can run the insert statement to insert a new website.
 INSERT INTO websites (url, check_interval, up_regex)
 VALUES ('http://google.com', 5, '')
 ```
-**NOTE**: currently the website_checker module does not detect new websites. You have to stop and start the module again in order to poll the new website.
+**NOTE**: currently the website_checker module does not detect new or deleted websites while it is running. You have to stop and start the module again in order to poll the new website or have the deleted websites stop being polled.
 
 **If you would like to remove a website**, you can use a utility function:
 ```shell
@@ -150,6 +150,7 @@ pytest -s -k 'test_insert_incorrect_website_status'
 
 ## Limitations / unverified features
 
+- The website_checker module does not detect new/deleted websites and start/stop the concurrent jobs.
 - Production deployment limitations: The website_checker.py runs threaded jobs based on the number of websites defined in the websites table. In a production setting, perhaps each job could be run as a separate docker container. Thus the code needs to be updated to accommodate this.
 - The kafka producers/consumers assumes that the topic has only 1 partition for simplicity. The topic created for this project, "website_status" has the default setup of having only 1 partition. As a result, only 1 consumer should be running. Running additional consumers (app.broker_db_sync) will have them idle unless the currently running producer is stopped.
 
