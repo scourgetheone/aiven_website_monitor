@@ -1,9 +1,10 @@
-## Aiven website status tracking app
+# Aiven website status tracking app
 
-### Requirements
+## Requirements
+
 Implement a system that monitors website availability over the network, produces metrics about this and passes these events through an Aiven Kafka instance into an Aiven PostgreSQL database.
 
-### Installing required packages (Debian)
+## Installing required packages (Debian)
 
 I assume that you are using python3. Sorry python2 people :(
 
@@ -27,7 +28,13 @@ From a terminal, do the following:
 ----test_pgsql_config.json
 ```
 
-### Running the application
+## Application overview
+
+- **app.website_checker**: checks the availability of websites defined in the DB's _websites_ table, and puts messages to the Kafka broker. The website_checker module uses timeloop to run jobs asynchronously in threads for each website to poll. Each website entry defines it's own polling interval (see tables definitions in the Database section below)
+- **app.broker_db_sync**: consumes the Kafka messages, process the data, and then save it into the _website_status_ table
+- **app.utils**: Various utility functions helping the above modules, and also facilitating testing modules
+
+## Running the application
 
 To run the module that polls websites and sends to the kafka broker, run in a terminal:
 ```shell
@@ -69,12 +76,7 @@ Alternatively you can run the delete statement to remove a website.
 DELETE FROM websites where id = ID
 ```
 
-### Application overview
-
-- **app.website_checker**: checks the availability of websites defined in the DB's _websites_ table, and puts messages to the Kafka broker. The website_checker module uses timeloop to run jobs asynchronously in threads for each website to poll. Each website entry defines it's own polling interval (see tables definitions in the Database section below)
-- **app.broker_db_sync**: consumes the Kafka messages, process the data, and then save it into the _website_status_ table
-
-### Database
+## Database
 
 Tables:
 - _websites_: a table that stores a list of websites which we will check
@@ -91,7 +93,7 @@ Tables:
     - **request_info** json NOT NULL: a JSON object containing information about the check request, e.g status code, response time
     - **PRIMARY KEY** (kafka_topic, kafka_partition_id, kafka_offset_id, website_id)
 
-### Task checklist
+## Task checklist
 
 - setup connections to kafka and postgres (done)
 - get rough prototype of producer/consumer scripts working (done)
@@ -105,7 +107,7 @@ Tables:
 - package keys and config files into zip (done)
 - write utility functions to create/remove kafka topics, access postgres database to list website status to terminal (kindof done via app/utils.py) (done)
 
-### What and how to test
+## What and how to test
 
 What is tested:
 - test correct/incorrect website urls (done)
@@ -123,12 +125,12 @@ pytest -s
 pytest -s -k 'test_insert_incorrect_website_status'
 ```
 
-### Limitations / unverified features
+## Limitations / unverified features
 
 - Production deployment limitations: The website_checker.py runs threaded jobs based on the number of websites defined in the websites table. In a production setting, perhaps each job could be run as a separate docker container. Thus the code needs to be updated to accommodate this.
 - The kafka producers/consumers assumes that the topic has only 1 partition for simplicity. The topic created for this project, "website_status" has the default setup of having only 1 partition. As a result, only 1 consumer should be running. Running additional consumers (app.broker_db_sync) will have them idle unless the currently running producer is stopped.
 
-### Attributions
+## Attributions
 
 - https://help.aiven.io/en/articles/489573-getting-started-with-aiven-postgresql
 - https://stackoverflow.com/questions/26899001/pytest-how-do-i-use-global-session-wide-fixtures
