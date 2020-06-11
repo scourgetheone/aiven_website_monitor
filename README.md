@@ -34,6 +34,8 @@ Your app/ folder should look like this after unzipping or if using files from th
 
 ## Application overview
 
+![alt text](aiven.png "Architecture Diagram")
+
 - **app.website_checker**: checks the availability of websites defined in the DB's _websites_ table, and puts messages to the Kafka broker. The website_checker module uses timeloop to run jobs asynchronously in threads for each website to poll. Each website entry defines it's own polling interval (see tables definitions in the Database section below)
 - **app.broker_db_sync**: consumes the Kafka messages, process the data, and then save it into the _website_status_ table
 - **app.utils**: Various utility functions helping the above modules, and also facilitating testing modules
@@ -50,10 +52,15 @@ python -m app.broker_db_sync
 ```
 
 If you would like to see currently which websites are being polled, open **pgcli** (HOSTNAME, PORT, USER, and PASSWORD to database is in pgsql_config.json in the "secret" zip file)
-```shell
+```sql
 pgcli -h HOSTNAME -p PORT -u USER -W homework
 
 SELECT * FROM websites;
+```
+
+If you would like to see the poll data saved into the database, open **pgcli** and make this query:
+```sql
+SELECT * FROM website_status order by timestamp_utc desc limit 20;
 ```
 
 **If you would like to add a new website for testing**, you can use a utility function:
