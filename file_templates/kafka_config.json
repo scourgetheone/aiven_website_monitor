@@ -1,5 +1,5 @@
 {
-    "bootstrap_servers": "ADD_URI_HERE",
+    "bootstrap_servers": "ADD_SERVICE_URI_HERE",
     "security_protocol": "SSL",
     "ssl_check_hostname": true,
     "ssl_cafile": "$DIRPATH$/ssl/kafkaCARoot.pem",
