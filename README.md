@@ -13,8 +13,8 @@ Prerequisites:
 - A python virtual environment for convenience. I use [pyenv virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
 From a terminal, do the following:
-- (optional) `sudo apt install libpq-dev`: This is optional because you may already have it. This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
-- (optional) `sudo apt install python3-dev`: also for psycopg2
+- `sudo apt install libpq-dev`: This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
+- `sudo apt install python3-dev`: also for psycopg2
 - Then, activate a new python virtual environment (e.g venv or pyenv virtualenv), go to the cloned repo's root directory and run: `pip install -r requirements.txt` and `python setup.py develop`
 - You have also received (hopefully) a zipped file containing keys and config files needed to connect to the Aiven pgsql and kafka instances. Unzip the contents of this zip file in the **app/** folder.
 
