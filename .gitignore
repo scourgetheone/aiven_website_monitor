@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 *.egg-info
+.venv
 
 app/__pycache__
 app/*.pyc
