@@ -30,21 +30,34 @@ Tables:
 
 - setup connections to kafka and postgres (done)
 - get rough prototype of producer/consumer scripts working (done)
-- implement website checker
+- implement website checker (done)
 - write database DDL scripts (done)
-- implement database writer
-- write tests
-- refine README.md
-- (optional) write utility functions to create/remove kafka topics, access postgres database to list website status to terminal
+- implement database writer (done)
+- implement regex checking of website content (done)
+- check handling of website with invalid url using timeloop (done)
+- write tests (done)
+- refine README.md and write instructions
+- package keys and config files into zip
+- (optional) write utility functions to create/remove kafka topics, access postgres database to list website status to terminal (kindof done via app/utils.py) (done)
 
 ### What to test
 
 Ideas:
-- test correct/incorrect website urls
-- handle special HTTP codes like 404 (page not found, so skip logging it)
-- test the data format going in and out of kafka
+- test correct/incorrect website urls (done)
+- handle special HTTP codes like 404 (page not found, so skip logging it) (partial)
+- test the data format going in and out of kafka (done)
 - database testing: replicate an existing database, then perform testing on it in various scenarios (like try to fail a test by removing a database column or adding wrong data type etc...)
+- test adding to website_status table a website foreign key that does not exist (done)
+- test adding wrong data formats to websites and website_status tables (done)
+
+### Limitations / unverified features
+
+- Timeloop: the timeloop module enables periodic execution of tasks. The limitation here is that if a task fails due to an exception (in this case from requests.get), it will stop the execution of other tasks. This probably won't happen with something like celery, but for this homework, timeloop was chosen due to it's simplicity. Right now only 2 exceptions are handled: InvalidSchema and InvalidURL.
+- The kafka producers/consumers assumes that the topic has only 1 partition for simplicity. The topic created for this project, "website_status" has the default setup of having only 1 partition. As a result, only 1 consumer should be running. Running additional consumers (app.broker_db_sync) will have them idle unless the currently running producer is stopped.
 
 ### Attributions
 
 - https://help.aiven.io/en/articles/489573-getting-started-with-aiven-postgresql
+- https://stackoverflow.com/questions/26899001/pytest-how-do-i-use-global-session-wide-fixtures
+- http://maximilianchrist.com/python/databases/2016/08/13/connect-to-apache-kafka-from-python-using-ssl.html
+- https://dev.to/wangonya/asserting-exceptions-with-pytest-8hl
