@@ -42,11 +42,11 @@ Your app/ folder should look like this after unzipping or if using files from th
 
 ## Running the application
 
-To run the module that polls websites and sends to the kafka broker, run in a terminal:
+**To run the module that polls websites and sends to the kafka broker**, run in a terminal:
 ```shell
 python -m app.website_checker
 ```
-To run the module that consumes messages from the kafka broker, run in another terminal:
+**To run the module that consumes messages from the kafka broker**, run in another terminal:
 ```shell
 python -m app.broker_db_sync
 ```
