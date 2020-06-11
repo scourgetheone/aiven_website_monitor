@@ -125,9 +125,10 @@ Tables:
 ## What and how to test
 
 What is tested:
-- test correct/incorrect website urls (done)
-- test the data format going in and out of kafka (done)
-- test vital functions broker_db_sync.sync_to_db() and website_checker.poll_website()
+- test correct/incorrect website urls
+- test the regex when receiving responses from website checks
+- test the data format going in and out of the kafka service
+- test the 2 vital functions: `broker_db_sync.sync_to_db()` and `website_checker.poll_website()`
 - test adding wrong data formats and key constraint fails to websites and website_status tables
 
 How to test:
