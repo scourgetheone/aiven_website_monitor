@@ -15,7 +15,7 @@ Prerequisites:
 From a terminal, do the following:
 - (optional) `sudo apt install libpq-dev`: This is optional because you may already have it. This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
 - (optional) `sudo apt install python3-dev`: also for psycopg2
-- Then, go to the cloned repo's root directory and run: `pip install -r requirements.txt` and `python setup.py develop`
+- Then, activate a new python virtual environment (e.g venv or pyenv virtualenv), go to the cloned repo's root directory and run: `pip install -r requirements.txt` and `python setup.py develop`
 - You have also received (hopefully) a zipped file containing keys and config files needed to connect to the Aiven pgsql and kafka instances. Unzip the contents of this zip file in the **app/** folder.
 
 If you have another Aiven postgres and Kafka instance that you would like to use, then copy the file structure inside the **file_templates/** folder and put in the required information in these files.
@@ -69,6 +69,7 @@ Alternatively you can run the insert statement to insert a new website.
 INSERT INTO websites (url, check_interval, up_regex)
 VALUES ('http://google.com', 5, '')
 ```
+**NOTE**: currently the website_checker module does not detect new websites. You have to stop and start the module again in order to poll the new website.
 
 **If you would like to remove a website**, you can use a utility function:
 ```shell
