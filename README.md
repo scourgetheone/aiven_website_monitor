@@ -13,7 +13,7 @@ Prerequisites:
 - A python virtual environment for convenience. I use [pyenv virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
 From a terminal, do the following:
-- (optional) `sudo apt install libpq-dev`: this is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
+- (optional) `sudo apt install libpq-dev`: This is optional because you may already have it. This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
 - (optional) `sudo apt install python3-dev`: also for psycopg2
 - Then, go to the cloned repo's root directory and run: `pip install -r requirements.txt` and `python setup.py develop`
 - You have also received (hopefully) a zipped file containing keys and config files needed to connect to the Aiven pgsql and kafka instances. Unzip the contents of this zip file in the **app/** folder. Your app/ folder should look like this after unzipping:
@@ -76,7 +76,7 @@ Alternatively you can run the delete statement to remove a website.
 DELETE FROM websites where id = ID
 ```
 
-## Database
+## Database schema
 
 Tables:
 - _websites_: a table that stores a list of websites which we will check
@@ -92,6 +92,16 @@ Tables:
     - **timestamp_utc** TIMESTAMP NOT NULL: a timestamp utc of when the check request was made
     - **request_info** json NOT NULL: a JSON object containing information about the check request, e.g status code, response time
     - **PRIMARY KEY** (kafka_topic, kafka_partition_id, kafka_offset_id, website_id)
+
+## Required Python packages
+
+- **pgcli**: this is only used for debugging purposes. This is a pgsql shell.
+- **psycopg2-binary**: required for connecting to the Aiven pgsql database
+- **kafka-python**: required for connecting to the Kafka instance
+- **requests**: required for checking website information
+- **timeloop**: running jobs concurrently and in a set time interval
+- **pytest**: used for running tests
+
 
 ## Task checklist
 
