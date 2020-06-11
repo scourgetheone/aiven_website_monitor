@@ -21,6 +21,10 @@ def sync_to_db(kafka_topic='website_status', test=False):
         - kafka_topic str: the name of the kafka topic
         - test bool: if True, sets the offset to 'earliest'
           and return the first result only
+
+        Returns a tuple whereby the first value is the message received
+        from kafka if test=True, and the second value is the Exception class
+        when an exception occurs. This is used during testing.
     """
     try:
         # HACK: auto_offset_reset is set to earliest when testing
@@ -61,7 +65,7 @@ def sync_to_db(kafka_topic='website_status', test=False):
 
                 if test:
                     consumer.close()
-                    return message
+                    return message, None
 
     except JSONDecodeError as e:
         print(e)

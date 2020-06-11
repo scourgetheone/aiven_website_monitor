@@ -103,7 +103,7 @@ def test_insert_correct_website_status(monkeypatch):
     with utils.connect_to_db(test=True) as cursor:
         monkeypatch.setattr(kafka, 'KafkaConsumer', mock_kafka_consumer)
 
-        message_received = broker_db_sync.sync_to_db('test', True)
+        message_received, _ = broker_db_sync.sync_to_db('test', True)
         print('Got message from kafka broker')
 
         assert message_received

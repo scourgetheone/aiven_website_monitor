@@ -56,7 +56,7 @@ def test_end_to_end_function(producer, monkeypatch):
     message_to_send = website_checker.poll_website(producer, website, 'test')
     print('Polled website and sent message from kafka broker')
 
-    message_received = broker_db_sync.sync_to_db('test', True)
+    message_received, _ = broker_db_sync.sync_to_db('test', True)
     print('Got message from kafka broker')
 
     # Verify that the kafka topic is 'test', and the partition and offset
