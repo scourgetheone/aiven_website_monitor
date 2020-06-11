@@ -32,7 +32,7 @@ def test_end_to_end_function(producer, monkeypatch):
     website = None
     try:
         website_id = utils.add_new_website('https://google.com', test=True)
-        website = utils.get_websites(id=website_id)
+        website = utils.get_websites(id=website_id, test=True)
     except psycopg2.errors.UniqueViolation:
         print('website already exists!')
         print('Database tables were not properly removed during last test round!')
