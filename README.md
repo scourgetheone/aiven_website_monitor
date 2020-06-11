@@ -13,12 +13,12 @@ Prerequisites:
 - A python virtual environment for convenience. I use [pyenv virtualenv](https://github.com/pyenv/pyenv-virtualenv)
 
 From a terminal, do the following:
-- (optional) `sudo apt install libpq-dev`: This is optional because you may already have it. This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
-- (optional) `sudo apt install python3-dev`: also for psycopg2
+- `sudo apt install libpq-dev`: This is a prerequisite for psycopg2. For additional prerequisites, please refer to: https://www.psycopg.org/docs/install.html#prerequisites
+- `sudo apt install python3-dev`: also for psycopg2
 - Then, activate a new python virtual environment (e.g venv or pyenv virtualenv), go to the cloned repo's root directory and run: `pip install -r requirements.txt` and `python setup.py develop`
 - You have also received (hopefully) a zipped file containing keys and config files needed to connect to the Aiven pgsql and kafka instances. Unzip the contents of this zip file in the **app/** folder.
 
-If you have another Aiven postgres and Kafka instance that you would like to use, then copy the file structure inside the **file_templates/** folder and paste them into the **app/** folder. and put in the required information in these files.
+If you have another Aiven postgres and Kafka instance that you would like to use, then copy the file structure inside the **file_templates/** folder and paste them into the **app/** folder, then edit the required information in these files.
 
 Your app/ folder should look like this after unzipping or if using files from the file_templates folder:
 ```
@@ -125,9 +125,10 @@ Tables:
 ## What and how to test
 
 What is tested:
-- test correct/incorrect website urls (done)
-- test the data format going in and out of kafka (done)
-- test vital functions broker_db_sync.sync_to_db() and website_checker.poll_website()
+- test correct/incorrect website urls
+- test the regex when receiving responses from website checks
+- test the data format going in and out of the kafka service
+- test the 2 vital functions: `broker_db_sync.sync_to_db()` and `website_checker.poll_website()`
 - test adding wrong data formats and key constraint fails to websites and website_status tables
 
 How to test:
