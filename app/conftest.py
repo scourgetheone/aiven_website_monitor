@@ -1,3 +1,8 @@
+"""conftest.py
+
+Defines a session-wide fixture for all test modules
+"""
+
 import pytest
 import kafka
 

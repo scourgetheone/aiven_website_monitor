@@ -1,3 +1,7 @@
+"""broker_db_sync.py
+
+consumes the Kafka messages, process the data, and then save it into the _website_status_ table
+"""
 from json.decoder import JSONDecodeError
 from psycopg2.errors import (
     UniqueViolation,

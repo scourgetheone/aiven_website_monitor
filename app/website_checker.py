@@ -1,4 +1,7 @@
-# http://maximilianchrist.com/python/databases/2016/08/13/connect-to-apache-kafka-from-python-using-ssl.html
+"""website_checker.py
+
+checks the availability of websites defined in the DB's _websites_ table, and puts messages to the Kafka broker. The website_checker module uses timeloop to run jobs asynchronously in threads for each website to poll. Each website entry defines it's own polling interval.
+"""
 
 from timeloop import Timeloop
 from kafka import KafkaProducer

@@ -1,6 +1,6 @@
-"""test_end_to_end.py
+"""test_database_operations.py
 
-Tests the end to end functionality between the website_checker and broker_db_sync modules.
+Tests the various database operations done by the broker_db_sync module.
 """
 
 from psycopg2.errors import (

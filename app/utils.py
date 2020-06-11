@@ -1,3 +1,7 @@
+"""utils.py
+
+Various utility functions helping the above modules, and also facilitating testing modules
+"""
 from contextlib import contextmanager
 from kafka import KafkaAdminClient
 from kafka.admin import NewTopic
