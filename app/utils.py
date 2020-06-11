@@ -33,12 +33,27 @@ def read_json_config(file):
 #
 
 @contextmanager
-def connect_to_db():
-    conn = psycopg2.connect(read_json_config('pgsql_config.json')['uri'])
+def connect_to_db(test=False, include_conn=False):
+    """Connects to the pgsql database defined in pgsql_config.json
+
+        Args:
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
+        - include_conn bool: if True, also include the connection object and yields a tuple
+
+        Should be used with the 'when' directive, which yields the cursor object
+        and automatically commits and closes the connection.
+    """
+    config_file = 'pgsql_config.json'
+    if test:
+        config_file = 'test_pgsql_config.json'
+
+    conn = psycopg2.connect(read_json_config(config_file)['uri'])
     cursor = conn.cursor(cursor_factory=RealDictCursor)
 
+    yield_obj = (conn, cursor) if include_conn else cursor
+
     try:
-        yield cursor
+        yield yield_obj
     finally:
         # Commit the statements
         conn.commit()
@@ -47,25 +62,42 @@ def connect_to_db():
         conn.close()
 
 
-def test_database_connection():
-    with connect_to_db() as cursor:
+def test_database_connection(test=False):
+    with connect_to_db(test) as cursor:
         cursor.execute('SELECT 1 = 1')
         result = cursor.fetchone()
 
         print (result)
 
-def init_db():
+def init_db(test=False):
     """Initializes the empty database with required tables
+
+        Args:
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
     """
-    with connect_to_db() as cursor:
+    with connect_to_db(test) as cursor:
         init_db_filepath = os.path.join(os.path.dirname(__file__), 'db_scripts/init_db.sql')
         print (open(init_db_filepath, "r").read())
 
         cursor.execute(open(init_db_filepath, "r").read())
 
-        print ('Done.')
+        print ('Finished initializing the database.')
 
-def add_new_website(website_url, check_interval=5, up_regex=''):
+def drop_all_tables(test=False):
+    """Drops all tables from a database
+
+        Args:
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
+    """
+    with connect_to_db(test) as cursor:
+        init_db_filepath = os.path.join(os.path.dirname(__file__), 'db_scripts/drop_all_tables.sql')
+        print (open(init_db_filepath, "r").read())
+
+        cursor.execute(open(init_db_filepath, "r").read())
+
+        print ('Finished dropping all tables from the database.')
+
+def add_new_website(website_url, check_interval=5, up_regex='', test=False):
     """Adds a new website to the websites table
 
         Args:
@@ -73,42 +105,56 @@ def add_new_website(website_url, check_interval=5, up_regex=''):
         - check_interval int: how often in seconds should the website be checked
         - up_regex str: an optional regex expression that will be used when
           checking the website
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
+
+        Returns the database id of the website
     """
-    with connect_to_db() as cursor:
+    with connect_to_db(test) as cursor:
         cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
             VALUES (%s, %s, %s) RETURNING id',
             (website_url, check_interval, up_regex))
 
         # Return the id of the newly created website entry
-        id = cursor.fetchone()
+        row = cursor.fetchone()
 
-        return id['id']
+        return row['id']
 
-def get_websites(debug=False):
+def get_websites(id=None, test=False):
     """Gets a list of websites
 
         Args:
-        - debug: prints the results. Useful when executing from the terminal
+        - id int: optional id of a website. The function will then filter by id and return only a single DictRow result
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
 
-        Returns a list of DictRows holding website information
+        Returns a list of DictRows holding website information if id=None else
+        returns a single DictRow if website is found
     """
-    with connect_to_db() as cursor:
-        cursor.execute('SELECT * FROM websites')
-        rows = cursor.fetchall()
+    with connect_to_db(test) as cursor:
+        filter_by_id = 'WHERE id = {}'.format(id)
+        if not id:
+            filter_by_id = ''
 
-        if debug:
-            for row in rows:
-                print ('id: {}, url: {} , check interval: {}s, up_regex: {}'.format(
-                    row['id'], row['url'], row['check_interval'], row['up_regex']))
+        cursor.execute('SELECT * FROM websites {}'.format(filter_by_id))
+
+        if not id:
+            rows = cursor.fetchall()
+        else: rows = cursor.fetchone()
 
         return rows
 
 
-def remove_website(id):
+def remove_website(id, test=False):
+    """Removes a website
+
+        Args:
+        - id int: the database id of the website
+        - test bool: if True, connects to the database defined in test_pgsql_config.json
+    -
+    """
     if not id or type(id) != int:
         raise TypeError('id must be an integer')
 
-    with connect_to_db() as cursor:
+    with connect_to_db(test) as cursor:
         cursor.execute('DELETE FROM websites where id = {}'.format(id))
 
         return 'OK'
@@ -135,6 +181,8 @@ def delete_topics(topics):
     admin = get_kafka_admin_client()
     admin.delete_topics(topics)
 
+    print ('Finished deleting topics {}'.format(topics))
+
 def create_topics(topics):
     """Creates a list of topics
 
@@ -148,3 +196,19 @@ def create_topics(topics):
     admin = get_kafka_admin_client()
     new_topics = map(lambda topic: NewTopic(topic, 1, 3), topics)
     admin.create_topics(new_topics)
+
+    print ('Finished adding topics {}'.format(topics))
+
+#
+# *** Other misc functions ***
+#
+
+class AttrDict(dict):
+    """Conveniently access dictionary keys like object attributes
+
+    Blatantly copied from:
+    https://stackoverflow.com/questions/4984647/accessing-dict-keys-like-an-attribute
+    """
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
