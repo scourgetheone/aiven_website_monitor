@@ -20,7 +20,7 @@ From a terminal, do the following:
 
 If you have another Aiven postgres and Kafka instance that you would like to use, then copy the file structure inside the **file_templates/** folder and paste them into the **app/** folder, then edit the required information in these files.
 
-Your app/ folder should look like this after unzipping or if using files from the file_templates folder:
+Your **app/** folder should look like this after unzipping or if using files from the **file_templates/** folder:
 ```
 -app/
 ----ssl/
@@ -83,6 +83,7 @@ VALUES ('http://google.com', 5, '')
 python -c "import app.utils as utils;utils.remove_website('ID')"
 ```
 Replace 'ID' with the database ID of the website.
+
 Alternatively you can run the delete statement to remove a website.
 ```sql
 DELETE FROM websites where id = ID
