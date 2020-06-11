@@ -1,6 +1,3 @@
-# https://help.aiven.io/en/articles/489573-getting-started-with-aiven-postgresql
-# http://maximilianchrist.com/python/databases/2016/08/13/connect-to-apache-kafka-from-python-using-ssl.html
-
 from json.decoder import JSONDecodeError
 from psycopg2.errors import (
     UniqueViolation,
