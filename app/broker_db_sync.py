@@ -2,12 +2,6 @@
 
 consumes the Kafka messages, process the data, and then save it into the _website_status_ table
 """
-from json.decoder import JSONDecodeError
-from psycopg2.errors import (
-    UniqueViolation,
-    ForeignKeyViolation,
-    InvalidDatetimeFormat,
-)
 
 import kafka
 import json
@@ -42,43 +36,39 @@ def sync_to_db(kafka_topic='website_status', test=False):
 
             # Read from website_status topic and sync to the database
             for message in consumer:
-                print ("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
-                    message.offset, message.key,
-                    message.value))
+                try:
+                    print ('%s:%d:%d: key=%s value=%s' % (message.topic, message.partition,
+                        message.offset, message.key,
+                        message.value))
 
-                json_message = json.loads(message.value)
+                    json_message = json.loads(message.value)
 
-                cursor.execute('INSERT INTO website_status\
-                    (kafka_topic, kafka_partition_id, kafka_offset_id, website_id, timestamp_utc, request_info)\
-                    VALUES (%s, %s, %s, %s, %s, %s)',
-                    (
-                        message.topic,
-                        message.partition,
-                        message.offset,
-                        json_message['website_db_id'],
-                        json_message['timestamp_utc'],
-                        json.dumps(json_message),
+                    cursor.execute('INSERT INTO website_status\
+                        (kafka_topic, kafka_partition_id, kafka_offset_id, website_id, timestamp_utc, request_info)\
+                        VALUES (%s, %s, %s, %s, %s, %s)',
+                        (
+                            message.topic,
+                            message.partition,
+                            message.offset,
+                            json_message['website_db_id'],
+                            json_message['timestamp_utc'],
+                            json.dumps(json_message),
+                        )
                     )
-                )
-                # Commit after every successful fetch from the Kafka broker
-                conn.commit()
+                    # Commit after every successful fetch from the Kafka broker
+                    conn.commit()
+                except Exception as e:
+                    print(e)
+                    print('There was a problem parsing the message {}'.format(message))
+                    if test:
+                        consumer.close()
+                        return message, e
+                    else:
+                        continue
 
                 if test:
                     consumer.close()
                     return message, None
-
-    except JSONDecodeError as e:
-        print(e)
-        return message, JSONDecodeError
-    except UniqueViolation as e:
-        print(e)
-        return message, UniqueViolation
-    except ForeignKeyViolation as e:
-        print(e)
-        return message, ForeignKeyViolation
-    except InvalidDatetimeFormat as e:
-        print(e)
-        return message, InvalidDatetimeFormat
 
     except KeyboardInterrupt:
         consumer.close()

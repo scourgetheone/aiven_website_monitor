@@ -214,4 +214,4 @@ def test_insert_incorrect_website_status(monkeypatch):
             message_received, exception = broker_db_sync.sync_to_db('test', True)
             print('Got message from kafka broker')
 
-            assert exception == fail_message.exception
+            assert type(exception) == fail_message.exception
