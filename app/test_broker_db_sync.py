@@ -1,6 +1,8 @@
 """test_database_operations.py
 
-Tests the various database operations done by the broker_db_sync module.
+Tests the various database operations done by the broker_db_sync module:
+- test success scenarios
+- test adding wrong data formats and key constraint fails to websites and website_status tables
 """
 
 from psycopg2.errors import (
