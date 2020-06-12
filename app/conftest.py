@@ -26,6 +26,6 @@ def before_after_tests():
     utils.drop_all_tables(test=True)
 
     try:
-        utils.delete_topics(['test'])
+        utils.remove_topics(['test'])
     except kafka.errors.UnknownTopicOrPartitionError:
         print ('topic \'test\' has already been removed!?')

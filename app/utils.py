@@ -183,7 +183,7 @@ def get_kafka_admin_client():
     """
     return KafkaAdminClient(**read_json_config('kafka_config.json'))
 
-def delete_topics(topics):
+def remove_topics(topics):
     """Deletes a list of topics
 
         Args:
