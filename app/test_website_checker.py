@@ -1,4 +1,4 @@
-"""test_end_to_end.py
+"""test_website_checker.py
 
 Tests the website_checker module:
 - test correct/incorrect website urls

@@ -6,6 +6,11 @@ Tests the end to end functionality between the website_checker and broker_db_syn
 - test adding the website check message to the database
 """
 from kafka import KafkaProducer
+from psycopg2.errors import (
+    NotNullViolation,
+    InvalidTextRepresentation,
+    UniqueViolation,
+)
 
 import pytest
 import requests
@@ -93,3 +98,49 @@ def test_end_to_end_function(producer, monkeypatch):
             assert json_from_db[key] == json_message_received[key]
 
     print('Finished test_end_to_end')
+
+#
+# ** Database-related **
+#
+
+def test_insert_correct_website_data():
+    """Tests to see if inserting a valid website entry works
+    """
+    with utils.connect_to_db(test=True) as cursor:
+        cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
+            VALUES (%s, %s, %s) RETURNING id',
+            ('https://facebook.com', 6, ''))
+
+        # Return the id of the newly created website entry
+        row = cursor.fetchone()
+        assert row
+
+def test_insert_incorrect_website_data():
+    """Tests to see if inserting invalid website entries fail
+    """
+    # First we put in a valid entry.
+    # We will test uniqueness of the url later
+    with utils.connect_to_db(test=True) as cursor:
+        cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
+            VALUES (%s, %s, %s) RETURNING id',
+            ('https://aiven.io', 6, ''))
+
+    test_data = [
+        [None, 4, None, NotNullViolation], # Null url
+        ['asd', 'asd', None, InvalidTextRepresentation], # Non integer for check_interval
+        ['https://aiven.io', 4, None, UniqueViolation], # Unique constraint check
+    ]
+
+    for data in test_data:
+        exception = data.pop()
+
+        with pytest.raises(exception):
+            # NOTE: We create a new connection for every test case here
+            # Because psycopg2 will raise a InFailedSqlTransaction if
+            # we try to run another query after the previousone failed and
+            # raises an exception
+            with utils.connect_to_db(test=True) as cursor:
+                cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
+                    VALUES (%s, %s, %s) RETURNING id',
+                    tuple(data)
+                )

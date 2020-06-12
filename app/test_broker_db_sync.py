@@ -1,4 +1,4 @@
-"""test_database_operations.py
+"""test_broker_db_sync.py
 
 Tests the various database operations done by the broker_db_sync module:
 - test success scenarios
@@ -6,10 +6,8 @@ Tests the various database operations done by the broker_db_sync module:
 """
 
 from psycopg2.errors import (
-    NotNullViolation,
     UniqueViolation,
     ForeignKeyViolation,
-    InvalidTextRepresentation,
     InvalidDatetimeFormat,
 )
 from json.decoder import JSONDecodeError
@@ -23,50 +21,6 @@ from app.utils import AttrDict
 import app.utils as utils
 import app.website_checker as website_checker
 import app.broker_db_sync as broker_db_sync
-
-
-def test_insert_correct_website_data():
-    """Tests to see if inserting a valid website entry works
-    """
-    with utils.connect_to_db(test=True) as cursor:
-        cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
-            VALUES (%s, %s, %s) RETURNING id',
-            ('https://facebook.com', 6, ''))
-
-        # Return the id of the newly created website entry
-        row = cursor.fetchone()
-        assert row
-
-def test_insert_incorrect_website_data():
-    """Tests to see if inserting invalid website entries fail
-    """
-
-    # First we put in a valid entry.
-    # We will test uniqueness of the url later
-    with utils.connect_to_db(test=True) as cursor:
-        cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
-            VALUES (%s, %s, %s) RETURNING id',
-            ('https://aiven.io', 6, ''))
-
-    test_data = [
-        [None, 4, None, NotNullViolation], # Null url
-        ['asd', 'asd', None, InvalidTextRepresentation], # Non integer for check_interval
-        ['https://aiven.io', 4, None, UniqueViolation], # Unique constraint check
-    ]
-
-    for data in test_data:
-        exception = data.pop()
-
-        with pytest.raises(exception):
-            # NOTE: We create a new connection for every test case here
-            # Because psycopg2 will raise a InFailedSqlTransaction if
-            # we try to run another query after the previousone failed and
-            # raises an exception
-            with utils.connect_to_db(test=True) as cursor:
-                cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
-                    VALUES (%s, %s, %s) RETURNING id',
-                    tuple(data)
-                )
 
 
 def test_insert_correct_website_status(monkeypatch):
