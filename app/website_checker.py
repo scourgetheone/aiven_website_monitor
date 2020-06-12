@@ -68,7 +68,6 @@ def poll_website(producer, website, kafka_topic):
             else: message['regex_match'] = False
 
         producer.send(kafka_topic, message)
-        producer.flush()
 
         return message
 
