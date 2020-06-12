@@ -114,14 +114,25 @@ def add_new_website(website_url, check_interval=5, up_regex='', test=False):
         Returns the database id of the website
     """
     with connect_to_db(test) as cursor:
-        cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
-            VALUES (%s, %s, %s) RETURNING id',
-            (website_url, check_interval, up_regex))
+        # First, we check if the new website already exists but soft-deleted
+        cursor.execute("SELECT * FROM websites \
+            WHERE url = '{}' AND deleted = TRUE".format(website_url))
+        existing_website = cursor.fetchone()
 
-        # Return the id of the newly created website entry
-        row = cursor.fetchone()
+        if existing_website:
+            print('Website already exists but soft-deleted. Will now un-delete...')
+            cursor.execute('UPDATE websites SET deleted = FALSE \
+                WHERE id = {}'.format(existing_website['id']))
 
-        return row['id']
+            return existing_website['id']
+        else:
+            cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
+                VALUES (%s, %s, %s) RETURNING id',
+                (website_url, check_interval, up_regex))
+            # Return the id of the newly created website entry
+            row = cursor.fetchone()
+
+            return row['id']
 
 def get_websites(id=None, test=False):
     """Gets a list of websites
@@ -134,11 +145,11 @@ def get_websites(id=None, test=False):
         returns a single DictRow if website is found
     """
     with connect_to_db(test) as cursor:
-        filter_by_id = 'WHERE id = {}'.format(id)
+        where_clause = 'WHERE id = {} AND deleted = FALSE'.format(id)
         if not id:
-            filter_by_id = ''
+            where_clause = 'WHERE deleted = FALSE'
 
-        cursor.execute('SELECT * FROM websites {}'.format(filter_by_id))
+        cursor.execute('SELECT * FROM websites {}'.format(where_clause))
 
         if not id:
             rows = cursor.fetchall()
@@ -159,7 +170,7 @@ def remove_website(id, test=False):
         raise TypeError('id must be an integer')
 
     with connect_to_db(test) as cursor:
-        cursor.execute('DELETE FROM websites where id = {}'.format(id))
+        cursor.execute('UPDATE websites SET deleted = TRUE WHERE id = {}'.format(id))
 
         return 'OK'
 

@@ -95,6 +95,7 @@ Tables:
     - **url** varchar(2048) UNIQUE NOT NULL: The website's URL against which a periodic GET request will be made
     - **check_interval** INTEGER DEFAULT 5: How often in seconds to check for the website's availability
     - **up_regex** TEXT: an optional regex pattern used in order to look for any texts in the GET response that should be found
+    - **deleted** BOOLEAN DEFAULT FALSE: enable soft deletion of websites, a way to stop websites from being polled while keeping the existing poll statuses in the *website_status* table intact. Actually deleting a website from this table requires deleting all associated website status logs in the *website_status* table.
 
 - _website_status_: a table that gathers the website status
     - **kafka_topic**  VARCHAR (256) NOT NULL: the kafka topic from which the data was fetched

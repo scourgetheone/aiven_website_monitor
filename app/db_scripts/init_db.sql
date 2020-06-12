@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS websites(
     id serial PRIMARY KEY,
     url VARCHAR (2048) UNIQUE NOT NULL,
     check_interval INTEGER DEFAULT 5,
-    up_regex TEXT
+    up_regex TEXT,
+    deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS website_status(
