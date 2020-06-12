@@ -1,6 +1,7 @@
 """broker_db_sync.py
 
-consumes the Kafka messages, process the data, and then save it into the _website_status_ table
+consumes the Kafka messages, process the data, and then
+saves it into the _website_status_ table.
 """
 
 import kafka

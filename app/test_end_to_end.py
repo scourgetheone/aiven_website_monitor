@@ -137,8 +137,8 @@ def test_insert_incorrect_website_data():
         with pytest.raises(exception):
             # NOTE: We create a new connection for every test case here
             # Because psycopg2 will raise a InFailedSqlTransaction if
-            # we try to run another query after the previousone failed and
-            # raises an exception
+            # we try to run another query after the previous one failed
+            # and raises an exception
             with utils.connect_to_db(test=True) as cursor:
                 cursor.execute('INSERT INTO websites (url, check_interval, up_regex)\
                     VALUES (%s, %s, %s) RETURNING id',

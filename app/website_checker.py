@@ -1,6 +1,9 @@
 """website_checker.py
 
-checks the availability of websites defined in the DB's _websites_ table, and puts messages to the Kafka broker. The website_checker module uses timeloop to run jobs asynchronously in threads for each website to poll. Each website entry defines it's own polling interval.
+checks the availability of websites defined in the DB's _websites_ table,
+and puts messages to the Kafka broker. The website_checker module uses
+timeloop to run jobs asynchronously in threads for each website to poll.
+Each website entry defines it's own polling interval.
 """
 
 from timeloop import Timeloop
